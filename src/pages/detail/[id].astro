@@ -1,0 +1,65 @@
+---
+import Layout from "@layouts/Layout.astro";
+
+const { id } = Astro.params;
+
+const poster_url = "https://image.tmdb.org/t/p/w500/";
+
+const youtube = "https://www.youtube.com/embed/";
+
+// Data
+const fetchData = await fetch(
+  "https://api.themoviedb.org/3/movie/" +
+    id +
+    "?api_key=dc914e5cdcc044632c41b38f0d96a3fd&language=en-US"
+);
+const data = await fetchData.json();
+
+// Trailer
+const fetchVideos = await fetch(
+  "https://api.themoviedb.org/3/movie/" +
+    id +
+    "/videos?api_key=dc914e5cdcc044632c41b38f0d96a3fd&language=en-US"
+);
+const videos = await fetchVideos.json();
+const trailerResponse = videos.results.filter(
+  (video) => video.type === "Trailer"
+)[0];
+---
+
+<Layout>
+  <div class="row mt-5">
+    <div class="col-md-4">
+      <img
+        src={poster_url + data.poster_path}
+        alt="poster"
+        class="img-fluid rounded-start"
+      />
+    </div>
+
+    <div class="col-md-8">
+      <h1><span class="badge text-bg-dark">{data.title}</span></h1>
+
+      <h4>{data.tagline}</h4>
+
+      <h2>Overview</h2>
+
+      <p>{data.overview}</p>
+
+      <p><span class="badge text-bg-secondary">{data.release_date}</span></p>
+
+      <h2>
+        <span class="badge text-bg-danger">{Math.round(data.vote_average)}</span
+        >
+      </h2>
+    </div>
+  </div>
+
+  <h2>Trailer</h2>
+
+  <iframe
+    src={youtube + trailerResponse.key}
+    width="1280"
+    height="720"
+    allowfullscreen></iframe>
+</Layout>
